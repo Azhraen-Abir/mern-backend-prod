@@ -1,9 +1,9 @@
 {
   "env": {
-    "DB_USER": "abir_II",
-    "DB_PASSWORD": "Abir123.",
-    "DB_NAME": "mern",
-    "GEOAPIFY_API_KEY_V1": "53328da2f7dd4a74b8aeaf2989b7d4cd",
-    "JWT_KEY": "confidential_no_share"
+    "DB_USER": "Development",
+    "DB_PASSWORD": "Dev_pass",
+    "DB_NAME": "test_maybe",
+    "GEOAPIFY_API_KEY_V1": "KEY",
+    "JWT_KEY": "dev_secret_123456789"
   }
 }
