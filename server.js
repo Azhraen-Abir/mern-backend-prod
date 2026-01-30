@@ -59,13 +59,17 @@ app.use((error, req, res, next) => {
   } //if no res sent to frnt end
   res.status(error.code || 500).json({ message: error.message }); //if error.code is set if not 500 will be set as error code
 });
+
+//for render
+const PORT = process.env.PORT || 5000
+
 //core idea of database conncetion connect to MongoDb, if ok then start Backend Api if not throw error
 mongoose //mongoDB atlas connection URL || before the ? after /, replace the space before ? with a custom name for my created database, by default its "test" when ? only
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nuck6d2.mongodb.net/${process.env.DB_NAME}?appName=Cluster0`,
   )
   .then(() => {
-    app.listen(5000); //if connection successful start the Backend API
+    app.listen(PORT); //if connection successful start the Backend API
   })
   .catch((err) => {
     console.log(err); //throw the error if connection fails
