@@ -2,7 +2,7 @@
 const express = require("express"); //if need express in seperate files import needed
 //import only the check method here cz we only need the check method so we use the object destructure for this
 const { check } = require("express-validator");
-const fileUpload = require('../middleware/file-upload')//multer middleware
+const {fileUpload} = require('../middleware/file-upload')//multer middleware
 const checkAuth = require('../middleware/check-auth')
 const placesControllers = require("../controllers/places-controllers");
 

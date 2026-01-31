@@ -4,7 +4,7 @@ const express = require("express"); //if need express in seperate files import n
 const { check } = require("express-validator");
 
 const usersController = require("../controllers/users-controller");
-const fileUpload = require("../middleware/file-upload");
+const { fileUpload } = require("../middleware/file-upload");
 
 //the router method retuns an object
 const router = express.Router();
@@ -13,7 +13,7 @@ router.get("/", usersController.getUsers);
 //new user sets data to signup
 router.post(
   "/signup",
-  fileUpload.single('image'),//single() retrieves a single file, the name(image) expected in the body of the req that holds the image
+  fileUpload.single("image"), //single() retrieves a single file, the name(image) expected in the body of the req that holds the image
   [
     check("name").not().isEmpty(),
     check("email")

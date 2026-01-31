@@ -1,7 +1,11 @@
-const fs = require("fs");
-const { v4: uuid } = require("uuid"); //import uuid
+// const fs = require("fs");
+// const { v4: uuid } = require("uuid"); //import uuid
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} = require("../middleware/file-upload");
 
 const HttpError = require("../models/http-error"); //we are using it here too so import it
 const getCoordsForAddress = require("../util/location");
@@ -92,14 +96,28 @@ const createPlace = async (req, res, next) => {
     return next(error); //forward to next midware since async f cant throw error properly and quit the execution usin return
   }
 
+  if (!req.file) {
+    return next(new HttpError("Please upload an image.", 422));
+  }
+
+  let uploadedImage;
+  try {
+    uploadedImage = await uploadToCloudinary(req.file);
+  } catch (err) {
+    return next(new HttpError("Image upload failed, please try again.", 500));
+  }
+
   //new place creation model
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates, //as found from the geocode API
-    image: req.file.path, //path of the image
-    creator: req.userData.userId,//use the userId gotten frm check-auth, cz frontend creator id can be faked, so omitt it
+    image: {
+      url: uploadedImage.secure_url,
+      publicId: uploadedImage.public_id,
+    },
+    creator: req.userData.userId, //use the userId gotten frm check-auth, cz frontend creator id can be faked, so omitt it
   });
   //check if the provided userid exists already or not, if yes then create place for that user
   let existingUser;
@@ -215,7 +233,7 @@ const deletePlace = async (req, res, next) => {
   }
 
   //store the image path to delete the image from the backend
-  const imagePath = place.image;
+  const publicId = place.image.publicId;
 
   //remove the place by using deleteOne() method by mongoose
   try {
@@ -236,9 +254,11 @@ const deletePlace = async (req, res, next) => {
     return next(error); //stop execution
   }
   //delete the image if errs doesnt really matter xd
-  fs.unlink(imagePath, (err) => {
-    console.log(err);
-  });
+  try {
+  await deleteFromCloudinary(publicId);
+} catch (err) {
+  console.log("Cloudinary delete failed:", err.message);
+}
 
   //removing wont give back any document so the response stays the same.
   res.status(200).json({ message: "Deleted place." });

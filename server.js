@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 //error model default
 app.use((error, req, res, next) => {
   //default prop added by multer in req body is file, check if we do have file
-  if (req.file) {
+  if (req.file && req.file.path) {
     //unlink deletes the file
     fs.unlink(req.file.path, (err) => {
       console.log(err); //if delete fails use call back func, but we dont care abt this error tbh

@@ -4,6 +4,9 @@
     "DB_PASSWORD": "Dev_pass",
     "DB_NAME": "test_maybe",
     "GEOAPIFY_API_KEY_V1": "KEY",
-    "JWT_KEY": "dev_secret_123456789"
+    "JWT_KEY": "dev_secret_123456789",
+    "CLOUDINARY_CLOUD_NAME":"name ig",
+    "CLOUDINARY_API_KEY":"key ig",
+    "CLOUDINARY_API_SECRET":"secret ig"
   }
 }

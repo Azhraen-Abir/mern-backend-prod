@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs"); //helps with hashing passwords
 const jwt = require("jsonwebtoken"); //import the jsonwebtoken
+const { uploadToCloudinary } = require("../middleware/file-upload");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user"); // use capital for the const name cz its a constructor func
@@ -11,7 +12,7 @@ const getUsers = async (req, res, next) => {
   let users;
 
   try {
-    users = await User.find({}, "-password");//exclude the password
+    users = await User.find({}, "-password"); //exclude the password
   } catch (err) {
     //if find method fails
     return next(
@@ -66,11 +67,25 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  if (!req.file) {
+    return next(new HttpError("Please upload an image.", 422));
+  }
+
+  let uploadedImage;
+  try {
+    uploadedImage = await uploadToCloudinary(req.file);
+  } catch (err) {
+    return next(new HttpError("Image upload failed, please try again.", 500));
+  }
+
   //create a user
   const createdUser = new User({
     name,
     email,
-    image: req.file.path, //file, path both given my multer, path contains the exact loaction of img defined in backend (uploads/images/file-name)
+    image: {
+      url: uploadedImage.secure_url,
+      publicId: uploadedImage.public_id,
+    },
     password: hashedPassword, //store the hashed password
     places: [], //starting value is an empty array, later new created places will fill up this array.
   });
@@ -142,7 +157,7 @@ const login = async (req, res, next) => {
   //if isValidPassword is false
   if (!isValidPassword) {
     return next(
-      new HttpError("Invalid credentials could not log you in.", 403),//403: UNAUTHORIZED(Forbidden)
+      new HttpError("Invalid credentials could not log you in.", 403), //403: UNAUTHORIZED(Forbidden)
     );
   }
 
